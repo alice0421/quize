@@ -10,8 +10,9 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # install Node.js（マルチステージビルド）
 # Vue.js導入に必要（Breezeにも必要）
-COPY --from=node:latest /usr/local/bin /usr/local/bin
-COPY --from=node:latest /usr/local/lib /usr/local/lib
+# latestにするとバージョン依存のエラーが発生するのでLTSバージョンを指定（esbuildのエラー）
+COPY --from=node:18.16.1 /usr/local/bin /usr/local/bin
+COPY --from=node:18.16.1 /usr/local/lib /usr/local/lib
 
 # パッケージ管理ツール（apt-get）の更新＆必要パッケージのインストール
 RUN apt-get update \
