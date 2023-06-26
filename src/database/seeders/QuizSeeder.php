@@ -19,8 +19,7 @@ class QuizSeeder extends Seeder
             'quiz_year_id' => 1,
             'quiz_category_id' => 1,
             'content' => 
-            '一次、二次および三次予防に関する記述である。
-            最も適当なのはどれか。1つ選べ。',
+            "一次、二次および三次予防に関する記述である。\n最も適当なのはどれか。1つ選べ。",
             'created_at' => now(),
             'updated_at' => now()
         ]);
