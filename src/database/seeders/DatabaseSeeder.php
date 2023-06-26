@@ -20,7 +20,6 @@ class DatabaseSeeder extends Seeder
             QuizCategorySeeder::class,
             QuizSeeder::class,
             ChoiceSeeder::class,
-            CountSeeder::class,
             ExplanationSeeder::class,
             NoteSeeder::class,
             ResultSeeder::class,
