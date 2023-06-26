@@ -21,7 +21,8 @@ class QuizCategorySeeder extends Seeder
             'updated_at' => now()
         ]);
         DB::table('quiz_categories')->insert([
-            'name' => '人体の構造と機能及び疾病の成り立ち',
+            'name' => 
+            "人体の構造と機能\n及び\n疾病の成り立ち",
             'created_at' => now(),
             'updated_at' => now()
         ]);
