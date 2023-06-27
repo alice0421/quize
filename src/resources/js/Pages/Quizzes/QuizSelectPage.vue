@@ -28,7 +28,7 @@ const is_year = ref(true);
         <div class="pt-10">
             <div v-show="is_year" class="grid grid-cols-3 gap-4 w-2/3 mx-auto">
                 <div v-for="(year, index) in years" :key="year.id">
-                    <SelectContent :href="route('quiz.year.setting', { year: index+1 })" class="m-auto">{{ year.name }}</SelectContent>
+                    <SelectContent :href="route('quiz.year.setting', { year: index+1 })" bg_color="bg-orange-300" class="m-auto">{{ year.name }}</SelectContent>
                 </div>
             </div>
 
