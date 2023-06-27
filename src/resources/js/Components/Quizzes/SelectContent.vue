@@ -2,11 +2,11 @@
 defineProps({
     href: {
         type: String,
-        default: '/',
+        default: '#',
     },
     bg_color: {
         type: String,
-        default: 'bg-orange-300'
+        default: ''
     }
 });
 </script>

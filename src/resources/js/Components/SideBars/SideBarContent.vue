@@ -2,7 +2,7 @@
 defineProps({
     href: {
         type: String,
-        default: '/',
+        default: '#',
     },
 });
 </script>
