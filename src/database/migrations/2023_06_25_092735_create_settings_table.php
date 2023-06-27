@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users');
-            $table->enum('range', ['すべて', '完璧', '苦手', '未学習'])->default('すべて');
+            $table->enum('range', ['all', 'good', 'weak', 'unlearned'])->default('all');
             $table->integer('number')->default(30);
             $table->enum('order', ['asc', 'desc', 'rand'])->default('asc');
             $table->boolean('limit')->default(false);
