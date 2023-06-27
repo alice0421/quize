@@ -32,7 +32,7 @@ use Inertia\Inertia;
 //     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 // });
 
-Route::get('/quiz', function () {
+Route::get('/', function () {
     return Inertia::render('Home');
 })->name('home');
 
@@ -42,8 +42,8 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->controller(QuizController::class)->group(function () {
     Route::get('/quiz/select', 'select')->name('quiz.select');
-    Route::get('/quiz/year/{year}', 'setting_year')->name('quiz.year.setting');
-    Route::get('/quiz/category/{category}', 'setting_category')->name('quiz.category.setting');
+    Route::get('/quiz/{type}/{id}/setting', 'setting')->name('quiz.setting');
+    Route::get('/quiz/{type}/{id}', 'quiz')->name('quiz');
 });
 
 require __DIR__.'/auth.php';
