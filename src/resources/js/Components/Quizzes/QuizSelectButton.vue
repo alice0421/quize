@@ -12,8 +12,8 @@ defineProps({
 </script>
 
 <template>
-    <a :href=href class="table whitespace-pre-wrap rounded-md h-24 w-40" :class=bg_color>
-        <p class="table-cell text-center align-middle py-2">
+    <a :href=href class="table whitespace-pre-wrap rounded-md h-16 w-44" :class=bg_color>
+        <p class="table-cell text-xl text-center align-middle py-2">
             <slot />
         </p>
     </a>

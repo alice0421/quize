@@ -16,5 +16,10 @@
         "tailwindcss": "^3.2.1",
         "vite": "^4.0.0",
         "vue": "^3.2.41"
+    },
+    "dependencies": {
+        "chart.js": "^3.9.1",
+        "chartjs-plugin-datalabels": "^2.2.0",
+        "vue-chart-3": "^3.1.8"
     }
 }
