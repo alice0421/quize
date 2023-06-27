@@ -27,6 +27,7 @@ const order = ref({
 });
 const is_limited = ref(false);
 const number = ref(30);
+const limit = ref(15);
 const quiz_num = ref(100);
 
 function isProgSelected(event){
@@ -136,7 +137,7 @@ const options = ref({
 
             <div class="mt-8">
                 <label for="number" class="text-xl mr-10 align-middle">問題数</label>
-                <QuizNumberSettingInput type="number" name="number" v-model="number"/>
+                <QuizNumberSettingInput type="number" id="number" v-model="number"/>
                 <span class="ml-5 align-bottom">問/{{ quiz_num }}問</span>
             </div>
 
@@ -147,12 +148,12 @@ const options = ref({
             </div>
 
             <div class="mt-8">
-                <label for="number" class="mr-10 text-xl align-middle">時間制限</label>
+                <label for="limit" class="mr-10 text-xl align-middle">時間制限</label>
                 <QuizSettingButton @click="is_limited = !is_limited" :active="!is_limited" class="mr-5">なし</QuizSettingButton>
                 <QuizSettingButton @click="is_limited = !is_limited" :active="is_limited">あり</QuizSettingButton>
                 <span :class="{ 'text-gray-300': !is_limited }">
                     <span class="text-4xl font-bold align-middle">→</span>
-                    <QuizNumberSettingInput type="number" name="number" v-model="number" :disabled="!is_limited" />
+                    <QuizNumberSettingInput type="number" id="limit" v-model="limit" :disabled="!is_limited" />
                     <span class="ml-5 align-bottom">秒/1問</span>
                 </span>
             </div>
