@@ -43,6 +43,7 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->controller(QuizController::class)->group(function () {
     Route::get('/quiz/select', 'select')->name('quiz.select');
     Route::get('/quiz/{type}/{id}/setting', 'setting')->name('quiz.setting');
+    Route::post('/quiz/{type}/{id}/setting', 'setting_store')->name('quiz.setting.store');
     Route::get('/quiz/{type}/{id}', 'quiz')->name('quiz');
 });
 
