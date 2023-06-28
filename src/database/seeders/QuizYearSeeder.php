@@ -16,6 +16,12 @@ class QuizYearSeeder extends Seeder
     public function run()
     {
         DB::table('quiz_years')->insert([
+            'name' => '第36回',
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        DB::table('quiz_years')->insert([
             'name' => '第37回',
             'created_at' => now(),
             'updated_at' => now()
