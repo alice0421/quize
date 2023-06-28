@@ -1,8 +1,8 @@
 <script setup>
 defineProps({
-    href: {
+    type: {
         type: String,
-        default: '#',
+        default: 'submit',
     },
     bg_color: {
         type: String,
@@ -12,9 +12,11 @@ defineProps({
 </script>
 
 <template>
-    <a :href=href class="table rounded-md h-12 w-32" :class=bg_color>
-        <p class="table-cell text-center align-middle">
-            <slot />
-        </p>
-    </a>
+    <button
+        :type="type"
+        class="rounded-md h-12 w-32 text-center align-middle"
+        :class=bg_color
+    >
+        <slot />
+    </button>
 </template>
