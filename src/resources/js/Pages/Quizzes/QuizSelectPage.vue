@@ -1,6 +1,6 @@
 <script setup>
 import MainLayout from '@/Layouts/MainLayout.vue';
-import QuizSelectButton from '@/Components/Quizzes/QuizSelectButton.vue';
+import QuizSelectButton from '@/Components/QuizSelect/QuizSelectButton.vue';
 import { Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
 

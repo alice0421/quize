@@ -1,6 +1,6 @@
 <script setup>
 import MainLayout from '@/Layouts/MainLayout.vue';
-import ContentSelectButton from '@/Components/Homes/ContentSelectButton.vue';
+import ContentSelectButton from '@/Components/Home/ContentSelectButton.vue';
 import { Head } from '@inertiajs/vue3';
 </script>
 

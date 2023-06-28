@@ -1,8 +1,8 @@
 <script setup>
 import MainLayout from '@/Layouts/MainLayout.vue';
-import QuizNumberSettingInput from '@/Components/Quizzes/QuizNumberSettingInput.vue';
-import QuizSettingButton from '@/Components/Quizzes/QuizSettingButton.vue';
-import QuizSettingConfirmButton from '@/Components/Quizzes/QuizSettingConfirmButton.vue';
+import QuizNumberSettingInput from '@/Components/QuizSetting/QuizNumberSettingInput.vue';
+import QuizSettingButton from '@/Components/QuizSetting/QuizSettingButton.vue';
+import QuizSettingConfirmButton from '@/Components/QuizSetting/QuizSettingConfirmButton.vue';
 import { Head } from '@inertiajs/vue3';
 import { PieChart } from 'vue-chart-3';
 import { Chart, registerables } from 'chart.js';
