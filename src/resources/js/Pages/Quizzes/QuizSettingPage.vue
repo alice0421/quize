@@ -7,49 +7,60 @@ import { Head } from '@inertiajs/vue3';
 import { PieChart } from 'vue-chart-3';
 import { Chart, registerables } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
 const props = defineProps({
     type: String,
     id: String,
-    name: String
+    name: Object,
+    total_num: Number,
+    setting: Object
 });
-const prog = ref({
-    'all': true,
+const range = ref({
+    'all': false,
     'good': false,
     'weak': false,
     'unlearned': false
 });
 const order = ref({
-    'asc': true,
+    'asc': false,
     'desc': false,
     'rand': false
 });
-const is_limited = ref(false);
-const number = ref(30);
-const limit = ref(15);
-const quiz_num = ref(100);
+const limit = ref({
+    'off': false,
+    'on': false
+});
 
-function isProgSelected(event){
-    Object.keys(prog.value).forEach(key => prog.value[key] = false);
+// DBに保存されている最新の設定を反映
+onMounted(() => {
+    range.value[props.setting.range] = true;
+    order.value[props.setting.order] = true;
+    props.setting.limit ? limit.value['on'] = true : limit.value['off'] = true;
+});
+
+// 出題問題選択ボタン切り替え制御
+function isRangeSelected(event){
+    Object.keys(range.value).forEach(key => range.value[key] = false);
     switch(event.target.id){
         case 'all':
-            prog.value.all = true;
+            range.value.all = true;
             break;
         case 'good':
-            prog.value.good = true;
+            range.value.good = true;
             break;
         case 'weak':
-            prog.value.weak = true;
+            range.value.weak = true;
             break;
         case 'unlearned':
-            prog.value.unlearned = true;
+            range.value.unlearned = true;
             break;
         default:
             break;
     }
 }
 
+// 問題順選択ボタン切り替え制御
 function isOrderSelected(event){
     Object.keys(order.value).forEach(key => order.value[key] = false);
     switch(event.target.id){
@@ -67,6 +78,22 @@ function isOrderSelected(event){
     }
 }
 
+// 制限時間選択ボタン切り替え制御
+function isLimitSelected(event){
+    Object.keys(limit.value).forEach(key => limit.value[key] = false);
+    switch(event.target.id){
+        case 'off':
+            limit.value.off = true;
+            break;
+        case 'on':
+            limit.value.on = true;
+            break;
+        default:
+            break;
+    }
+}
+
+// 学習割合用の円グラフ設定
 Chart.register(...registerables);
 const chartData = ref({
     labels: ['完璧', '苦手', '未学習'],
@@ -129,16 +156,16 @@ const options = ref({
 
         <div class="w-2/3 mt-32 mx-auto relative">
             <div class="flex justify-between">
-                <QuizSettingButton id='all' @click="isProgSelected($event)" :active="prog.all">すべて</QuizSettingButton>
-                <QuizSettingButton id='good' @click="isProgSelected($event)" :active="prog.good">完璧</QuizSettingButton>
-                <QuizSettingButton id='weak' @click="isProgSelected($event)" :active="prog.weak">苦手</QuizSettingButton>
-                <QuizSettingButton id='unlearned' @click="isProgSelected($event)" :active="prog.unlearned">未学習</QuizSettingButton>
+                <QuizSettingButton id='all' @click="isRangeSelected($event)" :active="range.all">すべて</QuizSettingButton>
+                <QuizSettingButton id='good' @click="isRangeSelected($event)" :active="range.good">完璧</QuizSettingButton>
+                <QuizSettingButton id='weak' @click="isRangeSelected($event)" :active="range.weak">苦手</QuizSettingButton>
+                <QuizSettingButton id='unlearned' @click="isRangeSelected($event)" :active="range.unlearned">未学習</QuizSettingButton>
             </div>
 
             <div class="mt-8">
                 <label for="number" class="text-xl mr-10 align-middle">問題数</label>
-                <QuizNumberSettingInput type="number" id="number" v-model="number"/>
-                <span class="ml-5 align-bottom">問/{{ quiz_num }}問</span>
+                <QuizNumberSettingInput type="number" id="number" v-model="setting.number" />
+                <span class="ml-5 align-bottom">問 / {{ total_num }}問</span>
             </div>
 
             <div class="flex justify-between mt-8">
@@ -149,11 +176,11 @@ const options = ref({
 
             <div class="mt-8">
                 <label for="limit" class="mr-10 text-xl align-middle">時間制限</label>
-                <QuizSettingButton @click="is_limited = !is_limited" :active="!is_limited" class="mr-5">なし</QuizSettingButton>
-                <QuizSettingButton @click="is_limited = !is_limited" :active="is_limited">あり</QuizSettingButton>
-                <span :class="{ 'text-gray-300': !is_limited }">
+                <QuizSettingButton id='off' @click="isLimitSelected($event)" :active="limit.off" class="mr-5">なし</QuizSettingButton>
+                <QuizSettingButton id='on' @click="isLimitSelected($event)" :active="limit.on">あり</QuizSettingButton>
+                <span :class="{ 'text-gray-300': !limit.on }">
                     <span class="text-4xl font-bold align-middle">→</span>
-                    <QuizNumberSettingInput type="number" id="limit" v-model="limit" :disabled="!is_limited" />
+                    <QuizNumberSettingInput type="number" id="limit" v-model="setting.limit_time" :disabled="!limit.on" />
                     <span class="ml-5 align-bottom">秒/1問</span>
                 </span>
             </div>

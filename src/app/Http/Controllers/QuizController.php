@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\QuizCategory;
+use App\Models\Setting;
 use App\Models\QuizYear;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class QuizController extends Controller
@@ -23,13 +25,17 @@ class QuizController extends Controller
             return Inertia::render('Quizzes/QuizSettingPage', [
                 'type' => $type,
                 'id' => $id,
-                'name' => QuizYear::find((int) $id)->name
+                'name' => QuizYear::find((int) $id)->name,
+                'total_num' => count(QuizYear::with('quizzes')->find((int) $id)->quizzes()->get()),
+                'setting' => Setting::where('user_id', Auth::id())->first()
             ]);
         } else {
             return Inertia::render('Quizzes/QuizSettingPage', [
                 'type' => $type,
                 'id' => $id,
-                'name' => QuizCategory::find((int) $id)->name
+                'name' => QuizCategory::find((int) $id)->name,
+                'total_num' => count(QuizCategory::with('quizzes')->find((int) $id)->quizzes()->get()),
+                'setting' => Setting::where('user_id', Auth::id())->first()
             ]);
         }
     }
