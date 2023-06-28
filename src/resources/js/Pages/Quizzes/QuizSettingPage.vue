@@ -45,15 +45,19 @@ function isRangeSelected(event){
     switch(event.target.id){
         case 'all':
             range.value.all = true;
+            props.setting.range = 'all';
             break;
         case 'good':
             range.value.good = true;
+            props.setting.range = 'good';
             break;
         case 'weak':
             range.value.weak = true;
+            props.setting.range = 'weak';
             break;
         case 'unlearned':
             range.value.unlearned = true;
+            props.setting.range = 'unlearned';
             break;
         default:
             break;
@@ -66,12 +70,15 @@ function isOrderSelected(event){
     switch(event.target.id){
         case 'asc':
             order.value.asc = true;
+            props.setting.order = 'asc';
             break;
         case 'desc':
             order.value.desc = true;
+            props.setting.order = 'desc';
             break;
         case 'rand':
             order.value.rand = true;
+            props.setting.order = 'rand';
             break;
         default:
             break;
@@ -84,13 +91,26 @@ function isLimitSelected(event){
     switch(event.target.id){
         case 'off':
             limit.value.off = true;
+            props.setting.limit = false;
             break;
         case 'on':
             limit.value.on = true;
+            props.setting.limit = true;
             break;
         default:
             break;
     }
+}
+
+// axios通信でバックエンドに設定を送る（非同期処理）
+const submit = () => {
+    axios.post(route('quiz.setting.store', {type: props.type, id: props.id}), {'settings': props.setting})
+        .then((res) => {
+            window.location = res.data.redirect;
+        })
+        .catch((err) => {
+            console.log(err.response);
+        });
 }
 
 // 学習割合用の円グラフ設定
@@ -154,52 +174,54 @@ const options = ref({
             </div>
         </div>
 
-        <div class="w-2/3 mt-32 mx-auto relative">
-            <div class="flex justify-between">
-                <QuizSettingButton id='all' @click="isRangeSelected($event)" :active="range.all">すべて</QuizSettingButton>
-                <QuizSettingButton id='good' @click="isRangeSelected($event)" :active="range.good">完璧</QuizSettingButton>
-                <QuizSettingButton id='weak' @click="isRangeSelected($event)" :active="range.weak">苦手</QuizSettingButton>
-                <QuizSettingButton id='unlearned' @click="isRangeSelected($event)" :active="range.unlearned">未学習</QuizSettingButton>
+        <form @submit.prevent='submit'>
+            <div class="w-2/3 mt-32 mx-auto relative">
+                <div class="flex justify-between">
+                    <QuizSettingButton id='all' @click="isRangeSelected($event)" :active="range.all">すべて</QuizSettingButton>
+                    <QuizSettingButton id='good' @click="isRangeSelected($event)" :active="range.good">完璧</QuizSettingButton>
+                    <QuizSettingButton id='weak' @click="isRangeSelected($event)" :active="range.weak">苦手</QuizSettingButton>
+                    <QuizSettingButton id='unlearned' @click="isRangeSelected($event)" :active="range.unlearned">未学習</QuizSettingButton>
+                </div>
+
+                <div class="mt-8">
+                    <label for="number" class="text-xl mr-10 align-middle">問題数</label>
+                    <QuizNumberSettingInput type="number" id="number" v-model="setting.number" />
+                    <span class="ml-5 align-bottom">問 / {{ total_num }}問</span>
+                </div>
+
+                <div class="flex justify-between mt-8">
+                    <QuizSettingButton id='asc' @click="isOrderSelected($event)" :active="order.asc">昇順</QuizSettingButton>
+                    <QuizSettingButton id='desc' @click="isOrderSelected($event)" :active="order.desc">降順</QuizSettingButton>
+                    <QuizSettingButton id='rand' @click="isOrderSelected($event)" :active="order.rand">ランダム</QuizSettingButton>
+                </div>
+
+                <div class="mt-8">
+                    <label for="limit" class="mr-10 text-xl align-middle">時間制限</label>
+                    <QuizSettingButton id='off' @click="isLimitSelected($event)" :active="limit.off" class="mr-5">なし</QuizSettingButton>
+                    <QuizSettingButton id='on' @click="isLimitSelected($event)" :active="limit.on">あり</QuizSettingButton>
+                    <span :class="{ 'text-gray-300': !limit.on }">
+                        <span class="text-4xl font-bold align-middle">→</span>
+                        <QuizNumberSettingInput type="number" id="limit" v-model="setting.limit_time" :disabled="!limit.on" />
+                        <span class="ml-5 align-bottom">秒/1問</span>
+                    </span>
+                </div>
             </div>
 
-            <div class="mt-8">
-                <label for="number" class="text-xl mr-10 align-middle">問題数</label>
-                <QuizNumberSettingInput type="number" id="number" v-model="setting.number" />
-                <span class="ml-5 align-bottom">問 / {{ total_num }}問</span>
+            <div class="w-full flex justify-end mt-10">
+                <QuizSettingConfirmButton
+                    :type="button"
+                    @click="backToSelect()"
+                    bg_color="bg-gray-300"
+                    class="mr-5"
+                >
+                    戻る
+                </QuizSettingConfirmButton>
+                <QuizSettingConfirmButton
+                    bg_color="bg-orange-300"
+                >
+                    OK
+                </QuizSettingConfirmButton>
             </div>
-
-            <div class="flex justify-between mt-8">
-                <QuizSettingButton id='asc' @click="isOrderSelected($event)" :active="order.asc">昇順</QuizSettingButton>
-                <QuizSettingButton id='desc' @click="isOrderSelected($event)" :active="order.desc">降順</QuizSettingButton>
-                <QuizSettingButton id='rand' @click="isOrderSelected($event)" :active="order.rand">ランダム</QuizSettingButton>
-            </div>
-
-            <div class="mt-8">
-                <label for="limit" class="mr-10 text-xl align-middle">時間制限</label>
-                <QuizSettingButton id='off' @click="isLimitSelected($event)" :active="limit.off" class="mr-5">なし</QuizSettingButton>
-                <QuizSettingButton id='on' @click="isLimitSelected($event)" :active="limit.on">あり</QuizSettingButton>
-                <span :class="{ 'text-gray-300': !limit.on }">
-                    <span class="text-4xl font-bold align-middle">→</span>
-                    <QuizNumberSettingInput type="number" id="limit" v-model="setting.limit_time" :disabled="!limit.on" />
-                    <span class="ml-5 align-bottom">秒/1問</span>
-                </span>
-            </div>
-        </div>
-
-        <div class="w-full flex justify-end mt-10">
-            <QuizSettingConfirmButton
-                :href="route('quiz.select')"
-                bg_color="bg-gray-300"
-                class="mr-5"
-            >
-                戻る
-            </QuizSettingConfirmButton>
-            <QuizSettingConfirmButton
-                :href="route('quiz', {type: type, id: id})"
-                bg_color="bg-orange-300"
-            >
-                OK
-            </QuizSettingConfirmButton>
-        </div>
+        </form>
     </MainLayout>
 </template>

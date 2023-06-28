@@ -9,6 +9,16 @@ class Setting extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'id',
+        'user_id',
+        'range',
+        'number',
+        'order',
+        'limit',
+        'limit_time'
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
