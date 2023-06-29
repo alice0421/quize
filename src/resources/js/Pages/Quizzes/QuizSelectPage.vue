@@ -26,15 +26,12 @@ const is_year = ref(true);
         </div>
 
         <div class="pt-5">
-            <div v-show="is_year" class="grid grid-cols-3 gap-4 w-2/3 mx-auto">
-                <div v-for="(year, index) in years" :key="year.id">
-                    <QuizSelectButton :href="route('quiz.setting', { type: 'year', id: index+1 })" bg_color="bg-orange-300" class="m-auto">{{ year.name }}</QuizSelectButton>
+            <div class="grid grid-cols-3 gap-4 justify-items-center w-2/3 mx-auto">
+                <div v-show="is_year" v-for="(year, index) in years" :key="year.id">
+                    <QuizSelectButton :href="route('quiz.setting', { type: 'year', id: index+1 })" class="bg-orange-300">{{ year.name }}</QuizSelectButton>
                 </div>
-            </div>
-
-            <div v-show="!is_year" class="grid grid-cols-3 gap-4 w-2/3 mx-auto">
-                <div v-for="(category, index) in categories" :key="category.id">
-                    <QuizSelectButton :href="route('quiz.setting', { type: 'category', id: index+1 })" bg_color="bg-emerald-300" class="m-auto">{{ category.name }}</QuizSelectButton>
+                <div v-show="!is_year" v-for="(category, index) in categories" :key="category.id">
+                    <QuizSelectButton :href="route('quiz.setting', { type: 'category', id: index+1 })" class="bg-emerald-300">{{ category.name }}</QuizSelectButton>
                 </div>
             </div>
         </div>

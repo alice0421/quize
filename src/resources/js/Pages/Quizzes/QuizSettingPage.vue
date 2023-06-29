@@ -12,7 +12,7 @@ import { onMounted, ref } from 'vue';
 const props = defineProps({
     type: String,
     id: String,
-    name: Object,
+    title: Object,
     total_num: Number,
     setting: Object
 });
@@ -102,6 +102,10 @@ function isLimitSelected(event){
     }
 }
 
+function backToSelect(){
+    window.location = route('quiz.select');
+}
+
 // axios通信でバックエンドに設定を送る（非同期処理）
 const submit = () => {
     axios.post(route('quiz.setting.store', {type: props.type, id: props.id}), {'settings': props.setting})
@@ -160,7 +164,7 @@ const options = ref({
 
     <MainLayout>
         <div class="relative">
-            <h1 class="text-5xl text-center">{{ name }}</h1>
+            <h1 class="text-5xl text-center">{{ title }}</h1>
 
             <div class="absolute top-[-20px] right-[-80px] w-full flex justify-end items-center">
                 <div class="w-44 h-44 mr-2">
@@ -209,7 +213,7 @@ const options = ref({
 
             <div class="w-full flex justify-end mt-10">
                 <QuizSettingConfirmButton
-                    :type="button"
+                    type="button"
                     @click="backToSelect()"
                     bg_color="bg-gray-300"
                     class="mr-5"
