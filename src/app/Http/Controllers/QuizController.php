@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\QuizCategory;
 use App\Models\Setting;
+use App\Models\Quiz;
+use App\Models\QuizCategory;
 use App\Models\QuizYear;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,7 +27,7 @@ class QuizController extends Controller
             return Inertia::render('Quizzes/QuizSettingPage', [
                 'type' => $type,
                 'id' => $id,
-                'name' => QuizYear::find((int) $id)->name,
+                'title' => QuizYear::find((int) $id)->name,
                 'total_num' => count(QuizYear::with('quizzes')->find((int) $id)->quizzes()->get()),
                 'setting' => Setting::where('user_id', Auth::id())->first()
             ]);
@@ -34,7 +35,7 @@ class QuizController extends Controller
             return Inertia::render('Quizzes/QuizSettingPage', [
                 'type' => $type,
                 'id' => $id,
-                'name' => QuizCategory::find((int) $id)->name,
+                'title' => QuizCategory::find((int) $id)->name,
                 'total_num' => count(QuizCategory::with('quizzes')->find((int) $id)->quizzes()->get()),
                 'setting' => Setting::where('user_id', Auth::id())->first()
             ]);
@@ -56,7 +57,20 @@ class QuizController extends Controller
         ], Response::HTTP_OK); // 選択した問題(年度か分野)のid
     }
 
-    public function quiz($type, $id){
-        dd('This is Quiz Page!');
+    public function quiz(Request $request, $type, $id){
+        $title = $type === 'year' ? QuizYear::find($id)->name : QuizCategory::find($id)->name;
+        $settings = Setting::where('user_id', Auth::id())->first();
+
+        // VueでリレーションできるようにEager Loadingで明示化 + 取得順序指定
+        if($settings->order === 'asc') $quizzes = Quiz::with('choices', 'quiz_year', 'quiz_category')->where('quiz_'.$type.'_id', $id)->orderBy('id', 'asc')->take((int) $settings->number)->get();
+        else if($settings->order === 'desc') $quizzes = Quiz::with('choices', 'quiz_year', 'quiz_category')->where('quiz_'.$type.'_id', $id)->orderBy('id', 'desc')->take((int) $settings->number)->get();
+        else $quizzes = Quiz::with('choices', 'quiz_year', 'quiz_category')->where('quiz_'.$type.'_id', $id)->inRandomOrder()->take((int) $settings->number)->get();
+
+        return Inertia::render('Quizzes/QuizPage',[
+            'title' => $title,
+            'limit' => $settings->limit,
+            'limit_time' => $settings->limit_time,
+            'quizzes' => $quizzes
+        ]);
     }
 }
