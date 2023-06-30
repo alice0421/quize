@@ -19,9 +19,9 @@ const props = defineProps({
 
 // axios通信でバックエンドに設定を送る（非同期処理）
 const submit = () => {
-    axios.post(route('quiz.setting.store', {type: props.type, id: props.id}), {'settings': props.setting})
+    axios.post(route('quiz.setting.store', {'type': props.type, 'id': props.id}), {'settings': props.setting})
         .then((res) => {
-            window.location = res.data.redirect;
+            router.get(res.data.redirect);
         })
         .catch((err) => {
             console.log(err.response);
