@@ -112,7 +112,6 @@ class QuizController extends Controller
     }
 
     public function quiz_result_detail($type, $id){
-        dd('detail!');
         $title = $type === 'year' ? QuizYear::find($id)->name : QuizCategory::find($id)->name;
         $setting = Setting::where('user_id', Auth::id())->first();
 
