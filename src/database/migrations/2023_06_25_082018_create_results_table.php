@@ -17,7 +17,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('quiz_id')->constrained('quizzes');
             $table->foreignId('user_id')->constrained('users');
-            $table->integer('count');
             $table->boolean('is_correct');
             $table->timestamps();
             $table->softDeletes();
