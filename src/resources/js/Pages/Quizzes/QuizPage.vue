@@ -4,6 +4,8 @@ import { Head, router } from '@inertiajs/vue3';
 import { onMounted, ref } from 'vue';
 
 const props = defineProps({
+    type: String,
+    id: String,
     title: String,
     limit: Boolean,
     limit_time: Number,
@@ -39,7 +41,7 @@ function showAnswer(){
 
 function nextQuiz(){
     // 最終問題（returnは下の挙動を動かさないためのもの）
-    if(this_quiz.value + 1 >= props.quizzes.length) return router.get(route('quiz.select'));
+    if(this_quiz.value + 1 >= props.quizzes.length) return router.get(route('quiz.result', {'type': props.type, 'id': props.id}));
 
     this_quiz.value++;
     is_quiz.value = !is_quiz.value;
