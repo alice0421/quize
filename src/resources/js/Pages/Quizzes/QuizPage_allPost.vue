@@ -14,9 +14,9 @@ const time = ref(props.limit_time);
 const setTimer = ref();
 const this_quiz = ref(0);
 const is_quiz = ref(true);
+const results = ref([]);
 
 onMounted(() => {
-    // 時間制限があった場合、カウントダウンを開始
     if(props.limit) setTimer.value = setInterval(countDown, 1000);
 });
 
@@ -30,9 +30,7 @@ const countDown = () => {
 }
 
 function showAnswer(){
-    // 時間制限があった場合、カウントダウンを停止
     if(props.limit) clearInterval(setTimer.value);
-
     is_quiz.value = !is_quiz.value;
     storeResult(props.quizzes[this_quiz.value]);
 }
@@ -45,7 +43,6 @@ function nextQuiz(){
     is_quiz.value = !is_quiz.value;
     is_selected.value = -1;
 
-    // 時間制限があった場合、カウントダウンを開始
     if(props.limit){
         time.value = props.limit_time;
         setTimer.value = setInterval(countDown, 1000);
@@ -57,18 +54,13 @@ function storeResult(quiz){
     let is_correct = true;
     if(is_selected.value === -1) is_correct = false;
     else if(!quiz.choices[is_selected.value].answer) is_correct = false;
-
-    // axiosで結果を1つずつpostする
-    const data = {
-        'result': {
-            'quiz_id': quiz.id,
-            'is_correct': is_correct
-        }
+    // resultsに全て保存しておき、axiosでまとめて最後にpostする。
+    const new_result = {
+        'quiz_id': quiz.id,
+        'is_correct': is_correct
     };
-    axios.post(route('quiz.result.store'), data)
-        .catch((err) => {
-            console.log(err);
-        });
+    results.value.push(new_result);
+    console.log(results.value);
 }
 </script>
 
@@ -114,9 +106,7 @@ function storeResult(quiz){
                             <div v-show="!is_quiz">
                                 <!-- 正解 -->
                                 <div v-if="choice.answer == true" class="relative mb-2">
-                                    <!-- 回答未選択: X -->
                                     <p v-if="is_selected === -1" class="absolute font-bold text-red-500 text-xl left-[-24px] top-1">X</p>
-                                    <!-- 回答選択: O -->
                                     <p v-else class="absolute font-bold text-blue-500 text-xl left-[-24px] top-1">O</p>
                                     <p class="w-full border border-gray-500 rounded-md py-1 px-2 bg-blue-300">
                                         {{ choice.content }}
@@ -130,7 +120,10 @@ function storeResult(quiz){
                                     </p>
                                 </div>
                                 <!-- それ以外 -->
-                                <p v-else class="w-full border border-gray-500 rounded-md py-1 px-2 mb-2">
+                                <p
+                                    v-else
+                                    class="w-full border border-gray-500 rounded-md py-1 px-2 mb-2"
+                                >
                                     {{ choice.content }}
                                 </p>
                             </div>

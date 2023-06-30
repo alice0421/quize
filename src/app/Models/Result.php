@@ -9,6 +9,12 @@ class Result extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'quiz_id',
+        'user_id',
+        'is_correct'
+    ];
+
     public function quiz()
     {
         return $this->belongsTo(Quiz::class);

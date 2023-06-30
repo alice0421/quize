@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Result;
 use App\Models\Setting;
 use App\Models\Quiz;
 use App\Models\QuizCategory;
@@ -72,5 +73,19 @@ class QuizController extends Controller
             'limit_time' => $settings->limit_time,
             'quizzes' => $quizzes
         ]);
+    }
+
+    public function quiz_store(Request $request){
+        $input_result = $request['result'];
+        $result = Result::create([
+            'quiz_id' => $input_result['quiz_id'],
+            'user_id' => Auth::id(),
+            'is_correct' => $input_result['is_correct']
+        ]);
+        return response()->json([
+            'quiz_id' => $result->quiz_id,
+            'user_id' => $result->user_id,
+            'is_correct' => $result->is_correct
+        ], Response::HTTP_OK);
     }
 }
