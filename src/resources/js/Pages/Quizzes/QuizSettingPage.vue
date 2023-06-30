@@ -3,11 +3,11 @@ import MainLayout from '@/Layouts/MainLayout.vue';
 import QuizNumberSettingInput from '@/Components/QuizSetting/QuizNumberSettingInput.vue';
 import QuizSettingButton from '@/Components/QuizSetting/QuizSettingButton.vue';
 import QuizSettingConfirmButton from '@/Components/QuizSetting/QuizSettingConfirmButton.vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import { PieChart } from 'vue-chart-3';
 import { Chart, registerables } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 
 const props = defineProps({
     type: String,
@@ -16,95 +16,6 @@ const props = defineProps({
     total_num: Number,
     setting: Object
 });
-const range = ref({
-    'all': false,
-    'good': false,
-    'weak': false,
-    'unlearned': false
-});
-const order = ref({
-    'asc': false,
-    'desc': false,
-    'rand': false
-});
-const limit = ref({
-    'off': false,
-    'on': false
-});
-
-// DBに保存されている最新の設定を反映
-onMounted(() => {
-    range.value[props.setting.range] = true;
-    order.value[props.setting.order] = true;
-    props.setting.limit ? limit.value['on'] = true : limit.value['off'] = true;
-});
-
-// 出題問題選択ボタン切り替え制御
-function isRangeSelected(event){
-    Object.keys(range.value).forEach(key => range.value[key] = false);
-    switch(event.target.id){
-        case 'all':
-            range.value.all = true;
-            props.setting.range = 'all';
-            break;
-        case 'good':
-            range.value.good = true;
-            props.setting.range = 'good';
-            break;
-        case 'weak':
-            range.value.weak = true;
-            props.setting.range = 'weak';
-            break;
-        case 'unlearned':
-            range.value.unlearned = true;
-            props.setting.range = 'unlearned';
-            break;
-        default:
-            break;
-    }
-}
-
-// 問題順選択ボタン切り替え制御
-function isOrderSelected(event){
-    Object.keys(order.value).forEach(key => order.value[key] = false);
-    switch(event.target.id){
-        case 'asc':
-            order.value.asc = true;
-            props.setting.order = 'asc';
-            break;
-        case 'desc':
-            order.value.desc = true;
-            props.setting.order = 'desc';
-            break;
-        case 'rand':
-            order.value.rand = true;
-            props.setting.order = 'rand';
-            break;
-        default:
-            break;
-    }
-}
-
-// 制限時間選択ボタン切り替え制御
-function isLimitSelected(event){
-    Object.keys(limit.value).forEach(key => limit.value[key] = false);
-    switch(event.target.id){
-        case 'off':
-            limit.value.off = true;
-            props.setting.limit = false;
-            break;
-        case 'on':
-            limit.value.on = true;
-            props.setting.limit = true;
-            break;
-        default:
-            break;
-    }
-}
-
-function backToSelect(){
-    window.location = route('quiz.select');
-}
 
 // axios通信でバックエンドに設定を送る（非同期処理）
 const submit = () => {
@@ -181,10 +92,11 @@ const options = ref({
         <form @submit.prevent='submit'>
             <div class="w-2/3 mt-32 mx-auto relative">
                 <div class="flex justify-between">
-                    <QuizSettingButton id='all' @click="isRangeSelected($event)" :active="range.all">すべて</QuizSettingButton>
-                    <QuizSettingButton id='good' @click="isRangeSelected($event)" :active="range.good">完璧</QuizSettingButton>
-                    <QuizSettingButton id='weak' @click="isRangeSelected($event)" :active="range.weak">苦手</QuizSettingButton>
-                    <QuizSettingButton id='unlearned' @click="isRangeSelected($event)" :active="range.unlearned">未学習</QuizSettingButton>
+                    <!-- :active="range === 'all'" というように管理すればオブジェクトの汚いやつは消える！-->
+                    <QuizSettingButton id='all' @click="setting.range = 'all'" :active="setting.range === 'all'">すべて</QuizSettingButton>
+                    <QuizSettingButton id='good' @click="setting.range = 'good'" :active="setting.range === 'good'">完璧</QuizSettingButton>
+                    <QuizSettingButton id='weak' @click="setting.range = 'weak'" :active="setting.range === 'weak'">苦手</QuizSettingButton>
+                    <QuizSettingButton id='unlearned' @click="setting.range = 'unlearned'" :active="setting.range === 'unlearned'">未学習</QuizSettingButton>
                 </div>
 
                 <div class="mt-8">
@@ -194,18 +106,18 @@ const options = ref({
                 </div>
 
                 <div class="flex justify-between mt-8">
-                    <QuizSettingButton id='asc' @click="isOrderSelected($event)" :active="order.asc">昇順</QuizSettingButton>
-                    <QuizSettingButton id='desc' @click="isOrderSelected($event)" :active="order.desc">降順</QuizSettingButton>
-                    <QuizSettingButton id='rand' @click="isOrderSelected($event)" :active="order.rand">ランダム</QuizSettingButton>
+                    <QuizSettingButton id='asc' @click="setting.order = 'asc'" :active="setting.order === 'asc'">昇順</QuizSettingButton>
+                    <QuizSettingButton id='desc' @click="setting.order = 'desc'" :active="setting.order === 'desc'">降順</QuizSettingButton>
+                    <QuizSettingButton id='rand' @click="setting.order = 'rand'" :active="setting.order === 'rand'">ランダム</QuizSettingButton>
                 </div>
 
                 <div class="mt-8">
                     <label for="limit" class="mr-10 text-xl align-middle">時間制限</label>
-                    <QuizSettingButton id='off' @click="isLimitSelected($event)" :active="limit.off" class="mr-5">なし</QuizSettingButton>
-                    <QuizSettingButton id='on' @click="isLimitSelected($event)" :active="limit.on">あり</QuizSettingButton>
-                    <span :class="{ 'text-gray-300': !limit.on }">
+                    <QuizSettingButton id='off' @click="setting.limit = false" :active="!setting.limit" class="mr-5">なし</QuizSettingButton>
+                    <QuizSettingButton id='on' @click="setting.limit = true" :active="setting.limit">あり</QuizSettingButton>
+                    <span :class="{ 'text-gray-300': !setting.limit }">
                         <span class="text-4xl font-bold align-middle">→</span>
-                        <QuizNumberSettingInput type="number" id="limit" v-model="setting.limit_time" :disabled="!limit.on" />
+                        <QuizNumberSettingInput type="number" id="limit" v-model="setting.limit_time" :disabled="!setting.limit" />
                         <span class="ml-5 align-bottom">秒/1問</span>
                     </span>
                 </div>
@@ -214,7 +126,7 @@ const options = ref({
             <div class="w-full flex justify-end mt-10">
                 <QuizSettingConfirmButton
                     type="button"
-                    @click="backToSelect()"
+                    @click="router.get(route('quiz.select'))"
                     bg_color="bg-gray-300"
                     class="mr-5"
                 >
