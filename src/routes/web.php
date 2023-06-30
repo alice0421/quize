@@ -46,6 +46,8 @@ Route::middleware('auth')->controller(QuizController::class)->group(function () 
     Route::post('/quiz/{type}/{id}/setting', 'setting_store')->name('quiz.setting.store');
     Route::get('/quiz/{type}/{id}', 'quiz')->name('quiz');
     Route::post('/quiz', 'quiz_store')->name('quiz.result.store');
+    Route::get('/quiz/{type}/{id}/result', 'quiz_result')->name('quiz.result');
+    Route::get('/quiz/{type}/{id}/result/detail', 'quiz_result_detail')->name('quiz.result.detail');
 });
 
 require __DIR__.'/auth.php';

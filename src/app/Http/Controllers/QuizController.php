@@ -45,7 +45,7 @@ class QuizController extends Controller
 
     public function setting_store(Request $request, $type, $id){
         // 設定を保存
-        $input_settings = $request['settings'];
+        $input_settings = $request['setting'];
         $input_settings['number'] = (int) $input_settings['number'];
         $input_settings['limit_time'] = (int) $input_settings['limit_time'];
 
@@ -60,17 +60,19 @@ class QuizController extends Controller
 
     public function quiz(Request $request, $type, $id){
         $title = $type === 'year' ? QuizYear::find($id)->name : QuizCategory::find($id)->name;
-        $settings = Setting::where('user_id', Auth::id())->first();
+        $setting = Setting::where('user_id', Auth::id())->first();
 
         // VueでリレーションできるようにEager Loadingで明示化 + 取得順序指定
-        if($settings->order === 'asc') $quizzes = Quiz::with('choices', 'quiz_year', 'quiz_category')->where('quiz_'.$type.'_id', $id)->orderBy('id', 'asc')->take((int) $settings->number)->get();
-        else if($settings->order === 'desc') $quizzes = Quiz::with('choices', 'quiz_year', 'quiz_category')->where('quiz_'.$type.'_id', $id)->orderBy('id', 'desc')->take((int) $settings->number)->get();
-        else $quizzes = Quiz::with('choices', 'quiz_year', 'quiz_category')->where('quiz_'.$type.'_id', $id)->inRandomOrder()->take((int) $settings->number)->get();
+        if($setting->order === 'asc') $quizzes = Quiz::with('choices', 'quiz_year', 'quiz_category')->where('quiz_'.$type.'_id', $id)->orderBy('id', 'asc')->take($setting->number)->get();
+        else if($setting->order === 'desc') $quizzes = Quiz::with('choices', 'quiz_year', 'quiz_category')->where('quiz_'.$type.'_id', $id)->orderBy('id', 'desc')->take($setting->number)->get();
+        else $quizzes = Quiz::with('choices', 'quiz_year', 'quiz_category')->where('quiz_'.$type.'_id', $id)->inRandomOrder()->take($setting->number)->get();
 
         return Inertia::render('Quizzes/QuizPage',[
+            'type' => $type,
+            'id' => $id,
             'title' => $title,
-            'limit' => $settings->limit,
-            'limit_time' => $settings->limit_time,
+            'limit' => $setting->limit,
+            'limit_time' => $setting->limit_time,
             'quizzes' => $quizzes
         ]);
     }
@@ -87,5 +89,48 @@ class QuizController extends Controller
             'user_id' => $result->user_id,
             'is_correct' => $result->is_correct
         ], Response::HTTP_OK);
+    }
+
+    public function quiz_result($type, $id){
+        $title = $type === 'year' ? QuizYear::find($id)->name : QuizCategory::find($id)->name;
+        $setting = Setting::where('user_id', Auth::id())->first();
+
+        // 正解数を取得
+        $correct_num = 0;
+        $results = Result::where('user_id', Auth::id())->orderBy('created_at', 'desc')->take($setting->number)->get();
+        foreach($results as $result){
+            if($result['is_correct'] == true) $correct_num++;
+        }
+
+        return Inertia::render('Quizzes/QuizResultPage',[
+            'type' => $type,
+            'id' => $id,
+            'title' => $title,
+            'total_num' => $setting->number,
+            'correct_num' => $correct_num,
+        ]);
+    }
+
+    public function quiz_result_detail($type, $id){
+        dd('detail!');
+        $title = $type === 'year' ? QuizYear::find($id)->name : QuizCategory::find($id)->name;
+        $setting = Setting::where('user_id', Auth::id())->first();
+
+        // 問題を取得
+        if($setting->order === 'asc') $quizzes = Quiz::with('choices', 'quiz_year', 'quiz_category')->where('quiz_'.$type.'_id', $id)->orderBy('id', 'asc')->take($setting->number)->get();
+        else if($setting->order === 'desc') $quizzes = Quiz::with('choices', 'quiz_year', 'quiz_category')->where('quiz_'.$type.'_id', $id)->orderBy('id', 'desc')->take($setting->number)->get();
+        else $quizzes = Quiz::with('choices', 'quiz_year', 'quiz_category')->where('quiz_'.$type.'_id', $id)->inRandomOrder()->take($setting->number)->get();
+
+        // 最新の結果（= 解いた問題の結果）を取得
+        $results = Result::where('user_id', Auth::id())->orderBy('created_at', 'desc')->take($setting->number)->get();
+        $results = $results->reverse()->values();
+
+        return Inertia::render('Quizzes/QuizResultDetailPage',[
+            'type' => $type,
+            'id' => $id,
+            'title' => $title,
+            'results' => $results,
+            'quizzes' => $quizzes
+        ]);
     }
 }
